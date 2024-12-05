@@ -6,21 +6,35 @@ export default function App() {
   const [toCur, setToCur] = useState("EUR");
   const [converted, setConverted] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
   useEffect(
     function () {
       async function converter() {
         setIsLoading(true);
-        const res = await fetch(
-          `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCur}&to=${toCur}`
-        );
-        const data = await res.json();
-        setConverted(data.rates[toCur]);
-        setIsLoading(false);
+        try {
+          const res = await fetch(
+            `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCur}&to=${toCur}`
+          );
+
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+
+          const data = await res.json();
+          setConverted(data.rates[toCur]);
+        } catch (err) {
+          setError(err.message); // Set error message
+        } finally {
+          setIsLoading(false); // Ensure loading state is updated
+        }
       }
 
-      if (fromCur === toCur) return setConverted(amount);
-      converter();
+      if (fromCur === toCur) {
+        setConverted(amount);
+      } else {
+        converter();
+      }
     },
     [amount, fromCur, toCur]
   );
