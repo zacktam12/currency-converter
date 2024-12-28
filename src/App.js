@@ -9,36 +9,41 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(
-    function () {
-      async function converter() {
-        setIsLoading(true);
-        try {
-          const res = await fetch(
-            `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCur}&to=${toCur}`
-          );
+  useEffect(() => {
+    async function converter() {
+      setIsLoading(true);
+      setError(null); // Clear previous error
+      try {
+        const res = await fetch(
+          `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCur}&to=${toCur}`
+        );
 
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-
-          const data = await res.json();
-          setConverted(data.rates[toCur]);
-        } catch (err) {
-          setError(err.message); // Set error message
-        } finally {
-          setIsLoading(false); // Ensure loading state is updated
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
-      }
 
-      if (fromCur === toCur) {
-        setConverted(amount);
-      } else {
-        converter();
+        const data = await res.json();
+        setConverted(data.rates[toCur]);
+      } catch (err) {
+        setError(err.message); // Set error message
+      } finally {
+        setIsLoading(false); // Ensure loading state is updated
       }
-    },
-    [amount, fromCur, toCur]
-  );
+    }
+
+    if (fromCur === toCur) {
+      setConverted(amount);
+    } else {
+      converter();
+    }
+  }, [amount, fromCur, toCur]);
+
+  const handleAmountChange = (e) => {
+    const value = Number(e.target.value);
+    if (!isNaN(value)) {
+      setAmount(value);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -46,7 +51,7 @@ export default function App() {
         type="text"
         className="input-amount"
         value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
+        onChange={handleAmountChange}
         disabled={isLoading}
       />
       <select
@@ -72,7 +77,7 @@ export default function App() {
       </select>
       <p className="conversion-result">
         {isLoading ? (
-          <p className="loading-text">Loading...</p>
+          <span className="loading-text">Loading...</span>
         ) : (
           `${converted} ${toCur}`
         )}
