@@ -63,6 +63,7 @@ export default function App() {
         <option value="EUR">EUR</option>
         <option value="CAD">CAD</option>
         <option value="INR">INR</option>
+        <option value="ETB">ETB</option>
       </select>
       <select
         className="currency-selector to-currency"
@@ -74,7 +75,7 @@ export default function App() {
         <option value="EUR">EUR</option>
         <option value="CAD">CAD</option>
         <option value="INR">INR</option>
-        <option value="ETB">INR</option>
+        <option value="ETB">ETB</option>
       </select>
       <p className="conversion-result">
         {isLoading ? (
